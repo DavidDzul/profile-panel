@@ -16,7 +16,20 @@ export const useTokenStore = defineStore('tokenStore', () => {
     }
   }
 
+  const getAttendanceStatus = async () => {
+    try {
+      const res = await axios.get('api/attendanceStatus', {
+        headers: { accept: 'application/json' },
+      })
+      return res.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+
   return {
     createToken,
+    getAttendanceStatus,
   }
 })

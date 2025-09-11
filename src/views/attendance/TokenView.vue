@@ -1,19 +1,52 @@
 <template>
+  <v-alert variant="tonal" density="compact" class="text-center">
+    ⚠️ <strong>Aviso:</strong> Este espacio es personal. Solo tú puedes marcar tu asistencia;
+    compartirlo está prohibido.
+  </v-alert>
   <v-container fluid>
-    <!-- Alerta arriba -->
-    <v-row justify="center">
-      <v-col cols="12" lg="8">
-        <v-alert variant="tonal" density="compact" class="alert-custom text-center">
-          ⚠️ <strong>Atención:</strong> Este QR es <strong>personal</strong>. No lo compartas; su
-          uso por otra persona será registrado.
-        </v-alert>
-      </v-col>
-    </v-row>
-
-    <!-- Botón centrado -->
+    <!-- Estado de asistencia -->
     <v-row justify="center" class="mt-6">
-      <v-col cols="12" lg="4" class="d-flex justify-center">
-        <v-btn color="primary" @click="generateToken" :loading="loading"> Generar QR </v-btn>
+      <v-col cols="12" lg="6" class="text-center">
+        <div v-if="attendanceStatus">
+          <!-- Puede hacer Check-In -->
+          <div v-if="attendanceStatus.can_checkin">
+            <v-alert class="mb-4" style="background-color: #275ffc; color: white">
+              <strong>{{ attendanceStatus.class.name }}</strong
+              ><br />
+              📅 {{ attendanceStatus.class.date }}<br />
+              ⏳ {{ attendanceStatus.class.start_time }} hrs -
+              {{ attendanceStatus.class.end_time }} hrs
+            </v-alert>
+            <v-btn color="tertiary" @click="generateToken" :loading="loading"> Generar QR </v-btn>
+          </div>
+
+          <!-- Puede hacer Check-Out -->
+          <div v-else-if="attendanceStatus.can_checkout">
+            <v-alert type="success" class="mb-4" :icon="false">
+              Has marcado entrada a las <strong>{{ attendanceStatus.check_in }} hrs.</strong><br />
+              Clase en curso: <strong>{{ attendanceStatus.class.name }}</strong>
+            </v-alert>
+            <v-btn color="warning" @click="generateToken" :loading="loading">
+              Marcar salida (Check-Out)
+            </v-btn>
+          </div>
+
+          <!-- Asistencia completada -->
+          <div v-else-if="attendanceStatus.is_completed">
+            <v-alert type="success" class="mb-4" :icon="false">
+              <strong>Asistencia completada</strong><br />
+              Entrada: {{ attendanceStatus.check_in }} hrs | Salida:
+              {{ attendanceStatus.check_out }} hrs
+            </v-alert>
+          </div>
+        </div>
+
+        <!-- Sin asignación -->
+        <div v-else>
+          <v-alert type="error" class="mb-4" :icon="false">
+            ❌ No tienes asignación de asistencia para hoy.
+          </v-alert>
+        </div>
       </v-col>
     </v-row>
 
@@ -28,25 +61,25 @@
           </p>
           <p v-else class="mt-2 text-body-2 text-error text-center">❌ Este QR ha expirado</p>
         </div>
-
-        <div v-else class="mt-3 text-body-2 text-gray">No hay QR generado aún.</div>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTokenPageStore } from '@/stores/views/tokenPage'
 import QrcodeVue from 'qrcode.vue'
 import dayjs from 'dayjs'
 
-const { loading, attendanceToken, expireToken } = storeToRefs(useTokenPageStore())
-const { onCreateAttendanceToken } = useTokenPageStore()
+const { loading, attendanceToken, expireToken, attendanceStatus } = storeToRefs(useTokenPageStore())
+const { onCreateAttendanceToken, fetchAttendanceStatus } = useTokenPageStore()
 
+// Generar token
 const generateToken = async () => {
   await onCreateAttendanceToken()
+  await fetchAttendanceStatus()
 }
 
 // Contador regresivo
@@ -66,6 +99,10 @@ watch(expireToken, () => {
   timer = setInterval(updateTime, 1000)
 })
 
+onMounted(async () => {
+  await fetchAttendanceStatus()
+})
+
 onUnmounted(() => {
   clearInterval(timer!)
 })
@@ -77,11 +114,5 @@ const seconds = computed(() => timeLeft.value % 60)
 <style scoped>
 .text-gray {
   color: #6b6b6b;
-}
-
-.alert-custom {
-  font-size: 0.9rem;
-  padding: 10px 16px;
-  margin-top: 24px;
 }
 </style>

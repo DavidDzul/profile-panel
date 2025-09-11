@@ -4,12 +4,13 @@ import { useTokenStore } from '@/stores/api/tokenStore'
 import { useAuthStore } from '@/stores/api/authStore'
 
 export const useTokenPageStore = defineStore('tokenPage', () => {
-  const { createToken } = useTokenStore()
+  const { createToken, getAttendanceStatus } = useTokenStore()
   const { userProfile } = storeToRefs(useAuthStore())
 
   const loading = ref(false)
   const attendanceToken = ref('')
   const expireToken = ref('')
+  const attendanceStatus = ref<AttendanceStatus | null>(null)
 
   const onCreateAttendanceToken = async () => {
     loading.value = true
@@ -28,10 +29,21 @@ export const useTokenPageStore = defineStore('tokenPage', () => {
     }
   }
 
+  const fetchAttendanceStatus = async () => {
+    try {
+      const res = await getAttendanceStatus()
+      attendanceStatus.value = res
+    } catch (e) {
+      console.error('Error fetching status:', e)
+    }
+  }
+
   return {
     loading,
     expireToken,
     attendanceToken,
+    attendanceStatus,
+    fetchAttendanceStatus,
     onCreateAttendanceToken,
   }
 })
