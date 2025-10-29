@@ -18,7 +18,19 @@ export const useTokenStore = defineStore('tokenStore', () => {
 
   const getAttendanceStatus = async () => {
     try {
-      const res = await axios.get('api/attendanceStatus', {
+      const res = await axios.get('api/validateAttendance', {
+        headers: { accept: 'application/json' },
+      })
+      return res.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+
+  const createCheckout = async () => {
+    try {
+      const res = await axios.post('api/attendance/check-out', {
         headers: { accept: 'application/json' },
       })
       return res.data
@@ -30,6 +42,7 @@ export const useTokenStore = defineStore('tokenStore', () => {
 
   return {
     createToken,
+    createCheckout,
     getAttendanceStatus,
   }
 })

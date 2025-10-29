@@ -8,7 +8,6 @@ export const useAuthPageStore = defineStore('authPage', () => {
 
   const onLogin = async (form: LoginInterface) => {
     loading.value = true
-    alert('Hello')
     try {
       if (form) {
         await login(form)

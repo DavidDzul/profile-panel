@@ -27,7 +27,7 @@
         <router-view />
       </v-container>
     </v-main>
-    <!-- <v-snackbar
+    <v-snackbar
       v-model="show"
       :timeout="7000"
       :location="'right top'"
@@ -36,17 +36,13 @@
       :vertical="true"
     >
       <div class="d-flex">
-        <v-icon
-          class="mt-1 mr-2"
-          v-if="config?.icon"
-          :icon="config.icon"
-        ></v-icon>
+        <v-icon class="mt-1 mr-2" v-if="config?.icon" :icon="config.icon"></v-icon>
         <div>
           <div class="text-subtitle-1 font-weight-bold">{{ config.title }}</div>
           <p>{{ config?.body }}</p>
         </div>
       </div>
-    </v-snackbar> -->
+    </v-snackbar>
   </v-layout>
   <!-- <UserProfileDialog
     v-model="openUserProfileDialog"
@@ -60,6 +56,7 @@ import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useAuthStore } from '@/stores/api/authStore'
 import { storeToRefs } from 'pinia'
+import { useAlertStore } from '@/stores/alert'
 
 import ProfileMenu from '@/layouts/ProfileMenu.vue'
 import NavMenu from '@/layouts/NavMenu.vue'
@@ -69,6 +66,7 @@ const drawer = ref(!mobile.value)
 
 const { logout } = useAuthStore()
 const { userProfile, userInitials, fullName } = storeToRefs(useAuthStore())
+const { show, config } = storeToRefs(useAlertStore())
 
 const onClick = () => {
   drawer.value = !drawer.value

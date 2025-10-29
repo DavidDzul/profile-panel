@@ -1,5 +1,5 @@
 declare interface AttendanceStatus {
-  status: 'PRESENT' | 'ABSENT' | 'JUSTIFIED'
+  status: 'PRESENT' | 'ABSENT' | 'JUSTIFIED' | 'LATE'
   class_status: 'IN_PROCESS' | 'COMPLETED'
   check_in: string | null
   check_out: string | null

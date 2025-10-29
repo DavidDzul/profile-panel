@@ -4,7 +4,7 @@ import { useTokenStore } from '@/stores/api/tokenStore'
 import { useAuthStore } from '@/stores/api/authStore'
 
 export const useTokenPageStore = defineStore('tokenPage', () => {
-  const { createToken, getAttendanceStatus } = useTokenStore()
+  const { createToken, getAttendanceStatus, createCheckout } = useTokenStore()
   const { userProfile } = storeToRefs(useAuthStore())
 
   const loading = ref(false)
@@ -32,10 +32,25 @@ export const useTokenPageStore = defineStore('tokenPage', () => {
   const fetchAttendanceStatus = async () => {
     try {
       const res = await getAttendanceStatus()
+      if (res.status === 'NOT_ASSIGNED') {
+        attendanceStatus.value = null
+      } else {
+        attendanceStatus.value = res
+      }
+    } catch (e) {
+      console.error('Error fetching status:', e)
+    }
+  }
+
+  const onCreateCheckout = async () => {
+    loading.value = true
+    try {
+      const res = await createCheckout()
       attendanceStatus.value = res
     } catch (e) {
       console.error('Error fetching status:', e)
     }
+    loading.value = false
   }
 
   return {
@@ -44,6 +59,7 @@ export const useTokenPageStore = defineStore('tokenPage', () => {
     attendanceToken,
     attendanceStatus,
     fetchAttendanceStatus,
+    onCreateCheckout,
     onCreateAttendanceToken,
   }
 })
