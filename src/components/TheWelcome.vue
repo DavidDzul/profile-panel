@@ -5,7 +5,7 @@
       <v-col cols="12" md="8" class="text-center">
         <h1 class="display-1 font-weight-bold">Hola, {{ userName }} 👋</h1>
         <p class="subtitle-1 text-subtitle-2">
-          Bienvenido al portal de Impulso Universitario Digital
+          Bienvenido/a al portal de Impulso Universitario A.C.
         </p>
       </v-col>
     </v-row>

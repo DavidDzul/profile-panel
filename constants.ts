@@ -14,10 +14,24 @@ export const statusMap = new Map([
     },
   ],
   [
-    'JUSTIFIED',
+    'JUSTIFIED_LATE',
     {
-      value: 'JUSTIFIED',
-      text: 'Justificado',
+      value: 'JUSTIFIED_LATE',
+      text: 'Retardo justificado',
+    },
+  ],
+  [
+    'JUSTIFIED_ABSENCE',
+    {
+      value: 'JUSTIFIED_ABSENCE',
+      text: 'Falta justificada',
+    },
+  ],
+  [
+    'ABSENT',
+    {
+      value: 'ABSENT',
+      text: 'Falta',
     },
   ],
 ])

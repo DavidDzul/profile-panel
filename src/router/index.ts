@@ -42,6 +42,11 @@ const routes = [
         name: 'TokenView',
         component: () => import('@/views/attendance/TokenView.vue'),
       },
+      {
+        path: '/historial',
+        name: 'HistoryView',
+        component: () => import('@/views/attendance/HistoryView.vue'),
+      },
     ],
   },
   {
