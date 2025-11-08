@@ -8,9 +8,11 @@ export const useAuthStore = defineStore('authStore', () => {
   const router = useRouter()
   const { showAlert } = useAlertStore()
 
+  const loading = ref(false)
   const token = ref('')
   const loggedUser = ref(false)
   const userProfile = ref<User | null>(null)
+  const openUpdateDialog = ref(false)
 
   const login = async (form: { enrollment: string; password: string }) => {
     try {
@@ -70,6 +72,33 @@ export const useAuthStore = defineStore('authStore', () => {
       })
   }
 
+  const updateUserProfile = async (form: UpdateUserForm) => {
+    loading.value = true
+    try {
+      const param = await axios.post('api/updateUser', form, {
+        headers: { accept: 'application/json' },
+      })
+      if (param) {
+        showAlert({
+          title: 'Información guardada exitosamente.',
+          status: 'success',
+        })
+        userProfile.value = param.data.user
+        loading.value = false
+        openUpdateDialog.value = false
+        return param.data.res
+      }
+    } catch (error) {
+      loading.value = false
+      console.error(error)
+      showAlert({
+        title: 'Error al guardar la información, intente nuevamente.',
+        status: 'error',
+      })
+      throw error
+    }
+  }
+
   const userInitials = computed(
     () =>
       `${userProfile?.value?.first_name.charAt(0) || ''}${userProfile?.value?.last_name.charAt(0) || ''}`,
@@ -78,14 +107,22 @@ export const useAuthStore = defineStore('authStore', () => {
     () => `${userProfile?.value?.first_name || ''} ${userProfile?.value?.last_name || ''}`,
   )
 
+  const onUpdateDialog = () => {
+    openUpdateDialog.value = true
+  }
+
   return {
     login,
     logout,
     getProfile,
+    updateUserProfile,
+    onUpdateDialog,
     userInitials,
     fullName,
     token,
     loggedUser,
     userProfile,
+    loading,
+    openUpdateDialog,
   }
 })

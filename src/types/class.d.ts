@@ -5,4 +5,6 @@ declare interface Class {
   start_time: string
   end_time: string
   campus: 'MERIDA' | 'TIZIMIN' | 'OXKUTZCAB' | 'VALLADOLID'
+  created_at: string
+  updated_at: string
 }

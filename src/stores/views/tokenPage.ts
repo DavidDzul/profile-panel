@@ -8,9 +8,25 @@ export const useTokenPageStore = defineStore('tokenPage', () => {
   const { userProfile } = storeToRefs(useAuthStore())
 
   const loading = ref(false)
+  const loadingStatus = ref(false)
   const attendanceToken = ref('')
   const expireToken = ref('')
   const attendanceStatus = ref<AttendanceStatus | null>(null)
+
+  const fetchAttendanceStatus = async () => {
+    loadingStatus.value = true
+    try {
+      const res = await getAttendanceStatus()
+      if (res.status === 'NOT_ASSIGNED') {
+        attendanceStatus.value = null
+      } else {
+        attendanceStatus.value = res.data
+      }
+    } catch (e) {
+      console.error('Error fetching status:', e)
+    }
+    loadingStatus.value = false
+  }
 
   const onCreateAttendanceToken = async () => {
     loading.value = true
@@ -29,24 +45,11 @@ export const useTokenPageStore = defineStore('tokenPage', () => {
     }
   }
 
-  const fetchAttendanceStatus = async () => {
-    try {
-      const res = await getAttendanceStatus()
-      if (res.status === 'NOT_ASSIGNED') {
-        attendanceStatus.value = null
-      } else {
-        attendanceStatus.value = res
-      }
-    } catch (e) {
-      console.error('Error fetching status:', e)
-    }
-  }
-
   const onCreateCheckout = async () => {
     loading.value = true
     try {
       const res = await createCheckout()
-      attendanceStatus.value = res
+      attendanceStatus.value = res.data
     } catch (e) {
       console.error('Error fetching status:', e)
     }
@@ -55,6 +58,7 @@ export const useTokenPageStore = defineStore('tokenPage', () => {
 
   return {
     loading,
+    loadingStatus,
     expireToken,
     attendanceToken,
     attendanceStatus,

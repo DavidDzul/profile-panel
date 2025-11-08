@@ -1,20 +1,13 @@
 declare interface AttendanceStatus {
-  status: 'PRESENT' | 'ABSENT' | 'LATE'
+  status: 'PRESENT' | 'ABSENT' | 'JUSTIFIED_LATE' | 'LATE' | 'JUSTIFIED_ABSENCE'
   class_status: 'IN_PROCESS' | 'COMPLETED'
   check_in: string | null
   check_out: string | null
   can_checkin: boolean
   can_checkout: boolean
   is_completed: boolean
-  class: {
-    id: number
-    name: string
-    date: string
-    start_time: string
-    end_time: string
-    created_at: string
-    updated_at: string
-  }
+  class_ended: boolean
+  class: Class
 }
 
 declare interface Attendance {

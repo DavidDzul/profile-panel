@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-4">
+  <v-container fluid>
     <!-- HEADER con gradiente -->
     <v-card
       class="pa-5 rounded-2xl elevation-4 mb-4"
@@ -19,7 +19,7 @@
       <v-col cols="12" class="py-2">
         <v-select
           v-model="selectedYear"
-          :items="[2025, 2026]"
+          :items="years"
           label="Seleccionar año"
           density="comfortable"
           variant="outlined"
@@ -42,36 +42,44 @@
 
     <!-- LISTA DE ASISTENCIAS -->
     <v-row dense>
-      <v-col v-for="(item, i) in filteredHistory" :key="i" cols="12">
-        <v-card class="pa-4 rounded-lg elevation-1 d-flex flex-column">
-          <div class="font-weight-bold text-primary mb-1" style="word-break: break-word">
-            📚 {{ item.class.name }}
-          </div>
+      <template v-if="loading">
+        <v-col cols="12" v-for="i in 5" :key="i">
+          <v-skeleton-loader type="list-item-two-line" class="rounded-lg" />
+        </v-col>
+      </template>
 
-          <div class="text-caption mb-2">
-            <strong>Fecha:</strong> {{ formatDate(item.class.date) }}
-          </div>
-
-          <v-divider class="my-1"></v-divider>
-
-          <div class="d-flex justify-space-between align-center mt-2 flex-wrap">
-            <v-chip
-              :color="statusColor(item.status)"
-              dark
-              label
-              size="small"
-              class="font-weight-medium mb-2"
-            >
-              {{ statusMap.get(item.status)?.text }}
-            </v-chip>
-
-            <div class="text-caption d-flex flex-column align-end">
-              <div><strong>Entrada:</strong> {{ item.check_in || '—' }}</div>
-              <div><strong>Salida:</strong> {{ item.check_out || '—' }}</div>
+      <template v-else>
+        <v-col v-for="(item, i) in filteredHistory" :key="i" cols="12">
+          <v-card class="pa-4 rounded-lg elevation-1 d-flex flex-column">
+            <div class="font-weight-bold text-primary mb-1" style="word-break: break-word">
+              📚 {{ item.class.name }}
             </div>
-          </div>
-        </v-card>
-      </v-col>
+
+            <div class="text-caption mb-2">
+              <strong>Fecha:</strong> {{ formatDate(item.class.date) }}
+            </div>
+
+            <v-divider class="my-1"></v-divider>
+
+            <div class="d-flex justify-space-between align-center mt-2 flex-wrap">
+              <v-chip
+                :color="statusColor(item.status)"
+                dark
+                label
+                size="small"
+                class="font-weight-medium mb-2"
+              >
+                {{ statusMap.get(item.status)?.text }}
+              </v-chip>
+
+              <div class="text-caption d-flex flex-column align-end">
+                <div><strong>Entrada:</strong> {{ item.check_in || '—' }} hrs</div>
+                <div><strong>Salida:</strong> {{ item.check_out || '—' }} hrs</div>
+              </div>
+            </div>
+          </v-card>
+        </v-col>
+      </template>
     </v-row>
 
     <!-- SIN DATOS -->
@@ -91,30 +99,23 @@ import { storeToRefs } from 'pinia'
 
 type StatusKey = 'PRESENT' | 'LATE' | 'JUSTIFIED' | 'ABSENT'
 
-const { userHistory } = storeToRefs(useHistoryPageStore())
+const { userHistory, loading } = storeToRefs(useHistoryPageStore())
+const { fetchHistory } = useHistoryPageStore()
 
-const selectedYear = ref(dayjs().year())
-
-const fetchHistory = async () => {
-  try {
-    const res = await fetch(`/api/attendance/history?year=${selectedYear.value}`)
-    const data = await res.json()
-    userHistory.value = data
-  } catch (error) {
-    console.error('Error al obtener historial:', error)
-  }
-}
+const currentYear = dayjs().year()
+const years = [currentYear, currentYear - 1]
+const selectedYear = ref(currentYear)
 
 onMounted(async () => {
-  await fetchHistory()
+  if (!userHistory.value || userHistory.value.length === 0) {
+    await fetchHistory(currentYear)
+  }
 })
 
-// Filtra por año (por si también se quiere filtrar localmente)
 const filteredHistory = computed(() =>
   userHistory.value?.filter((item) => dayjs(item.class.date).year() === selectedYear.value),
 )
 
-// Totales
 const totalByStatus = computed(() => {
   const totals: Record<StatusKey, number> = {
     PRESENT: 0,
@@ -134,7 +135,6 @@ const totalByStatus = computed(() => {
   return totals
 })
 
-// Colores
 const statusColor = (status: string) => {
   switch (status) {
     case 'PRESENT':
@@ -151,7 +151,6 @@ const statusColor = (status: string) => {
   }
 }
 
-// Resumen
 const statusSummary: { key: StatusKey; color: string; label: string }[] = [
   { key: 'PRESENT', color: 'green', label: 'A tiempo' },
   { key: 'LATE', color: 'orange', label: 'Retardos' },
@@ -160,6 +159,8 @@ const statusSummary: { key: StatusKey; color: string; label: string }[] = [
 ]
 
 const formatDate = (date: string) => dayjs(date).format('DD/MM/YYYY')
+
+// ENERO - JULIO / AGO - DIC
 </script>
 
 <style scoped>

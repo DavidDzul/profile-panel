@@ -1,7 +1,10 @@
 import axios from '@/axiosConfig'
 import { defineStore } from 'pinia'
+import { useAlertStore } from '@/stores/alert'
 
 export const useTokenStore = defineStore('tokenStore', () => {
+  const { showAlert } = useAlertStore()
+
   const createToken = async (form: CreateToken) => {
     try {
       const param = await axios.post('api/token', form, {
@@ -12,6 +15,10 @@ export const useTokenStore = defineStore('tokenStore', () => {
       }
     } catch (error) {
       console.error(error)
+      showAlert({
+        title: 'Error. Intente nuevamente o comunícate con el Área de Soporte para recibir ayuda.',
+        status: 'error',
+      })
       throw error
     }
   }
@@ -24,6 +31,10 @@ export const useTokenStore = defineStore('tokenStore', () => {
       return res.data
     } catch (error) {
       console.error(error)
+      showAlert({
+        title: 'Error. Intente nuevamente o comunícate con el Área de Soporte para recibir ayuda.',
+        status: 'error',
+      })
       throw error
     }
   }
@@ -36,6 +47,10 @@ export const useTokenStore = defineStore('tokenStore', () => {
       return res.data
     } catch (error) {
       console.error(error)
+      showAlert({
+        title: 'Error. Intente nuevamente o comunícate con el Área de Soporte para recibir ayuda.',
+        status: 'error',
+      })
       throw error
     }
   }

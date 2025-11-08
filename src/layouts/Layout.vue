@@ -15,6 +15,7 @@
         :initials="userInitials"
         :full-name="fullName"
         @logout="logout"
+        @configuration="onUpdateDialog"
       />
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" :permanent="!mobile" width="280">
@@ -44,11 +45,13 @@
       </div>
     </v-snackbar>
   </v-layout>
-  <!-- <UserProfileDialog
-    v-model="openUserProfileDialog"
+  <UpdateProfileDialog
+    v-if="userProfile"
+    v-model="openUpdateDialog"
     :edit-item="userProfile"
+    :loading="loading"
     @submit="updateUserProfile"
-  /> -->
+  />
 </template>
 
 <script setup lang="ts">
@@ -60,12 +63,14 @@ import { useAlertStore } from '@/stores/alert'
 
 import ProfileMenu from '@/layouts/ProfileMenu.vue'
 import NavMenu from '@/layouts/NavMenu.vue'
+import UpdateProfileDialog from '@/components/auth/UpdateProfileDialog.vue'
 
 const { mobile } = useDisplay()
 const drawer = ref(!mobile.value)
 
-const { logout } = useAuthStore()
-const { userProfile, userInitials, fullName } = storeToRefs(useAuthStore())
+const { logout, updateUserProfile, onUpdateDialog } = useAuthStore()
+const { userProfile, userInitials, fullName, loading, openUpdateDialog } =
+  storeToRefs(useAuthStore())
 const { show, config } = storeToRefs(useAlertStore())
 
 const onClick = () => {
