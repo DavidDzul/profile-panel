@@ -28,6 +28,19 @@
           @update:model-value="fetchHistory"
         />
       </v-col>
+      <v-col cols="12" class="py-2">
+        <v-select
+          v-model="selectedSemester"
+          :items="semesters"
+          label="Seleccionar semestre"
+          density="comfortable"
+          variant="outlined"
+          hide-details
+          class="rounded-lg"
+          item-title="title"
+          item-value="value"
+        />
+      </v-col>
       <v-col cols="6" sm="3" v-for="status in statusSummary" :key="status.key">
         <v-chip
           :color="status.color"
@@ -51,13 +64,26 @@
       <template v-else>
         <v-col v-for="(item, i) in filteredHistory" :key="i" cols="12">
           <v-card class="pa-4 rounded-lg elevation-1 d-flex flex-column">
-            <div class="font-weight-bold text-primary mb-1" style="word-break: break-word">
-              📚 {{ item.class.name }}
-            </div>
-
-            <div class="text-caption mb-2">
-              <strong>Fecha:</strong> {{ formatDate(item.class.date) }}
-            </div>
+            <v-row class="ma-0 pa-0 align-center">
+              <v-col cols="12" class="pa-0 mb-2">
+                <div class="text-center">
+                  <div
+                    class="font-weight-bold text-primary text-body-1"
+                    style="word-break: break-word"
+                  >
+                    📚 {{ item.class.name }}
+                  </div>
+                  <div class="text-caption text--secondary">
+                    <strong>Fecha:</strong> {{ formatDate(item.class.date) }}
+                  </div>
+                  <div class="font-weight-bold text-caption">Horario:</div>
+                  <div class="text--primary text-caption">
+                    <v-icon size="small" color="secondary">mdi-clock-time-four-outline</v-icon>
+                    {{ item.class.start_time }} hrs a {{ item.class.end_time }} hrs
+                  </div>
+                </div>
+              </v-col>
+            </v-row>
 
             <v-divider class="my-1"></v-divider>
 
@@ -85,7 +111,7 @@
     <!-- SIN DATOS -->
     <div v-if="!filteredHistory?.length" class="text-center py-10">
       <v-icon size="64" color="grey lighten-1">mdi-calendar-remove</v-icon>
-      <div class="text-subtitle-1 mt-3">No se encontraron asistencias para {{ selectedYear }}</div>
+      <div class="text-subtitle-1 mt-3">No se encontraron asistencias</div>
     </div>
   </v-container>
 </template>
@@ -105,6 +131,11 @@ const { fetchHistory } = useHistoryPageStore()
 const currentYear = dayjs().year()
 const years = [currentYear, currentYear - 1]
 const selectedYear = ref(currentYear)
+const semesters = [
+  { title: 'Enero - Junio', value: 1 },
+  { title: 'Agosto - Diciembre', value: 2 },
+]
+const selectedSemester = ref(null)
 
 onMounted(async () => {
   if (!userHistory.value || userHistory.value.length === 0) {
@@ -112,9 +143,21 @@ onMounted(async () => {
   }
 })
 
-const filteredHistory = computed(() =>
-  userHistory.value?.filter((item) => dayjs(item.class.date).year() === selectedYear.value),
-)
+const filteredHistory = computed(() => {
+  if (!selectedSemester.value) return []
+
+  return userHistory.value?.filter((item) => {
+    const d = dayjs(item.class.date)
+    const yearMatch = d.year() === selectedYear.value
+
+    const month = d.month() + 1
+
+    const semesterMatch =
+      selectedSemester.value === 1 ? month >= 1 && month <= 6 : month >= 8 && month <= 12
+
+    return yearMatch && semesterMatch
+  })
+})
 
 const totalByStatus = computed(() => {
   const totals: Record<StatusKey, number> = {
