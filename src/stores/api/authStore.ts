@@ -3,10 +3,12 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAlertStore } from '@/stores/alert'
+import { useNoticePageStore } from '@/stores/views/noticePage'
 
 export const useAuthStore = defineStore('authStore', () => {
   const router = useRouter()
   const { showAlert } = useAlertStore()
+  const { fetchNotices } = useNoticePageStore()
 
   const loading = ref(false)
   const token = ref('')
@@ -31,7 +33,6 @@ export const useAuthStore = defineStore('authStore', () => {
       localStorage.setItem('token', token.value)
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
-
       await router.push({ path: '/' })
     } catch (error) {
       console.error('Error en login:', error)
@@ -70,6 +71,7 @@ export const useAuthStore = defineStore('authStore', () => {
       .catch((error) => {
         console.error('Error al obtener el perfil:', error)
       })
+    await fetchNotices()
   }
 
   const updateUserProfile = async (form: UpdateUserForm) => {
