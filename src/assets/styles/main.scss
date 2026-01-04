@@ -1,6 +1,17 @@
+@font-face {
+  font-family: 'RoobertPRO';
+  src: url('@/assets/fonts/RoobertPRO-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 html {
   overflow-y: auto;
   background-color: #f1f5f8;
+  font-family: 'RoobertPRO', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .full-width {
@@ -33,12 +44,7 @@ html {
 }
 
 .extension-bar .v-btn--variant-text .v-btn__overlay {
-  background: rgba(
-    255,
-    251,
-    0,
-    0.877
-  ); /* Cambia el color y la opacidad según lo que necesites */
+  background: rgba(255, 251, 0, 0.877); /* Cambia el color y la opacidad según lo que necesites */
 }
 
 .extension-bar .v-btn.v-btn--density-default {
@@ -50,4 +56,9 @@ html {
   border-radius: initial;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
+}
+
+.text-caption {
+  letter-spacing: 0.01em !important;
+  font-weight: 500; // Roobert se lee mejor con un peso ligeramente mayor al normal en pantallas pequeñas
 }

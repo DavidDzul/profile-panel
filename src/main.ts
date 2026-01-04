@@ -38,6 +38,13 @@ const vuetify = createVuetify({
       myCustomLightTheme,
     },
   },
+  defaults: {
+    global: {
+      style: {
+        fontFamily: "'Inter', sans-serif",
+      },
+    },
+  },
 })
 
 const app = createApp(App)

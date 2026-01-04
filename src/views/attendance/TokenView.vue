@@ -19,14 +19,40 @@
           <div v-if="attendanceStatus">
             <!-- Puede hacer Check-In -->
             <div v-if="attendanceStatus.can_checkin && !attendanceStatus.class_ended">
-              <v-alert class="mb-4" style="background-color: #275ffc; color: white">
-                <p class="pb-5" style="font-weight: 600">¡Tienes una sesión asignada para hoy!</p>
-                <strong>📚 Sesión:</strong> {{ attendanceStatus.class.name }} <br />
-                <!-- <strong>Fecha:</strong> {{ attendanceStatus.class.date }}<br /> -->
+              <v-card class="mb-6 rounded-lg overflow-hidden shadow-lg border-0" variant="flat">
+                <v-sheet color="#275ffc" class="pa-4 align-center">
+                  <v-icon icon="mdi-calendar-check" color="white" class="mr-3" size="28"></v-icon>
+                  <span
+                    class="text-white font-weight-bold text-uppercase tracking-wider"
+                    style="font-size: 0.85rem"
+                  >
+                    Sesión Programada para Hoy
+                  </span>
+                </v-sheet>
 
-                <strong>Horario:</strong> {{ attendanceStatus.class.start_time }} hrs a
-                {{ attendanceStatus.class.end_time }} hrs
-              </v-alert>
+                <v-card-text class="pa-6 bg-white">
+                  <v-row align="center" no-gutters>
+                    <v-col cols="12" class="mb-4">
+                      <div class="text-overline text-grey-darken-1">Nombre de la sesión</div>
+                      <h2
+                        class="font-weight-black text-primary mb-2"
+                        style="letter-spacing: -0.5px"
+                      >
+                        {{ attendanceStatus.class.name }}
+                      </h2>
+                    </v-col>
+
+                    <v-col cols="12">
+                      <div class="text-overline text-grey-darken-1">Horario</div>
+
+                      <strong>
+                        {{ attendanceStatus.class.start_time }} hrs a
+                        {{ attendanceStatus.class.end_time }} hrs
+                      </strong>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
               <v-btn color="tertiary" @click="generateToken" :loading="loading"> Generar QR </v-btn>
             </div>
 
@@ -50,30 +76,20 @@
                   </div>
                 </v-card-title>
 
-                <v-card-text class="bg-surface pa-6 rounded-b-xl text-center">
-                  <!-- <v-chip
-                  :color="statusMap.get(attendanceStatus.status)?.color"
-                  size="large"
-                  label
-                  class="font-weight-black elevation-2 mb-4"
-                >
-                  {{ statusMap.get(attendanceStatus.status)?.text }}
-                </v-chip> -->
+                <v-card-text class="bg-surface pa-6 text-center">
+                  <div class="text-overline text-grey-darken-1">Nombre de la sesión</div>
+                  <h3 class="font-weight-black text-black line-clamp-1 mb-3">
+                    {{ attendanceStatus.class.name }}
+                  </h3>
 
-                  <!-- <v-divider class="mb-4"></v-divider> -->
+                  <div class="text-overline text-grey-darken-1">Horario</div>
 
-                  <v-row no-gutters class="mb-2">
-                    <v-col
-                      cols="6"
-                      class="text-subtitle-1 font-weight-medium text-left text-grey-darken-1"
-                    >
-                      <v-icon icon="mdi-calendar-range" class="mr-2"></v-icon>
-                      Sesión:
-                    </v-col>
-                    <v-col cols="6" class="text-right text-subtitle-1 font-weight-bold text-wrap">
-                      {{ attendanceStatus.class.name }}
-                    </v-col>
-                  </v-row>
+                  <strong
+                    >{{ attendanceStatus.class.start_time }} hrs a
+                    {{ attendanceStatus.class.end_time }} hrs</strong
+                  >
+
+                  <v-divider class="my-4"></v-divider>
 
                   <v-row no-gutters>
                     <v-col
@@ -81,7 +97,7 @@
                       class="text-subtitle-1 font-weight-medium text-left text-grey-darken-1"
                     >
                       <v-icon icon="mdi-clock-outline" class="mr-2"></v-icon>
-                      Hora de Entrada:
+                      Entrada:
                     </v-col>
                     <v-col cols="6" class="text-right text-subtitle-1 font-weight-bold">
                       {{ attendanceStatus.check_in }} hrs
@@ -124,19 +140,28 @@
                     size="x-large"
                     class="mr-3"
                   ></v-icon>
-                  <h5 class="font-weight-bold text-uppercase">
+                  <h5 class="text-wrap font-weight-bold text-uppercase">
                     {{ statusMap.get(attendanceStatus.status)?.title }}
                   </h5>
                 </v-card-title>
 
-                <v-card-text class="bg-surface pa-6 rounded-b-xl text-center">
+                <v-card-text class="bg-surface pa-6 text-center">
                   <v-row>
-                    <v-col cols="12">
-                      <p class="text-subtitle-1 font-weight-medium pb-3">
-                        📚 {{ attendanceStatus.class.name }}
-                      </p>
+                    <v-col class="mb-5" cols="12">
+                      <div class="text-overline text-grey-darken-1">Nombre de la sesión</div>
+                      <h3 class="font-weight-black text-black line-clamp-1 mb-3">
+                        {{ attendanceStatus.class.name }}
+                      </h3>
+
+                      <div class="text-overline text-grey-darken-1">Horario</div>
+
+                      <strong
+                        >{{ attendanceStatus.class.start_time }} hrs a
+                        {{ attendanceStatus.class.end_time }} hrs</strong
+                      >
                     </v-col>
                   </v-row>
+
                   <v-chip
                     :color="statusMap.get(attendanceStatus.status)?.color"
                     size="large"
