@@ -7,7 +7,12 @@
             <v-card rounded="0" :flat="true" min-height="100%" class="d-flex flex-wrap">
               <v-card-text class="card-center">
                 <div class="login__screen-logo mx-auto">
-                  <img class="v-responsive" src="@/assets/img/logo_text.png" alt="logo" />
+                  <!-- <img class="v-responsive" src="@/assets/img/logo_text.png" alt="logo" /> -->
+
+                  <div class="font-custom text-center" style="font-size: 1.3rem">
+                    <h1 class="slogan-title">cOnectA iu</h1>
+                    <p class="slogan-text">“la Conexión que Impulsa tu Trayectoria”</p>
+                  </div>
                 </div>
                 <router-view />
               </v-card-text>
@@ -43,6 +48,17 @@ const { show, config } = storeToRefs(useAlertStore())
 </script>
 
 <style scoped lang="scss">
+@font-face {
+  font-family: 'EDNimpkish';
+  src: url('@/assets/fonts/EDNimpkish-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-custom {
+  font-family: 'EDNimpkish', sans-serif !important;
+}
+
 .login__container {
   min-height: 100svh;
 }

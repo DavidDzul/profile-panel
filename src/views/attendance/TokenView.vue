@@ -232,7 +232,7 @@
     <!-- QR generado -->
     <v-row justify="center" class="mt-6">
       <v-col cols="12" lg="4" class="d-flex flex-column justify-center align-center">
-        <div v-if="attendanceToken" class="text-center">
+        <div v-if="attendanceToken && !attendanceStatus?.check_in" class="text-center">
           <div v-if="timeLeft > 0" @click="showQrDialog = true" style="cursor: pointer">
             <p class="mb-2 text-body-2 text-gray text-center">
               Válido por: {{ minutes }}m {{ seconds }}s
@@ -262,7 +262,10 @@
       </v-toolbar>
 
       <!-- Contenido centrado -->
-      <div class="flex-grow-1 d-flex flex-column justify-center align-center">
+      <div
+        v-if="!attendanceStatus?.check_in"
+        class="flex-grow-1 d-flex flex-column justify-center align-center"
+      >
         <template v-if="timeLeft > 0">
           <p class="mb-2 text-body-2 text-gray text-center">
             Válido por: {{ minutes }}m {{ seconds }}s
@@ -301,20 +304,31 @@ const timeLeft = ref(0)
 let timer: number | null = null
 
 const updateTime = () => {
-  if (expireToken.value) {
+  if (expireToken.value && !attendanceStatus.value?.check_in) {
     const diff = dayjs(expireToken.value).diff(dayjs(), 'second')
     timeLeft.value = diff > 0 ? diff : 0
   }
 }
 
-watch(expireToken, () => {
-  clearInterval(timer!)
-  updateTime()
-  timer = setInterval(updateTime, 1000)
-})
+watch(
+  expireToken,
+  () => {
+    if (timer) clearInterval(timer)
+    updateTime()
+    timer = setInterval(updateTime, 1000)
+  },
+  { immediate: true },
+)
 
 onMounted(async () => {
   await fetchAttendanceStatus()
+
+  updateTime()
+
+  if (expireToken.value && timeLeft.value > 0 && !attendanceStatus.value?.check_in) {
+    clearInterval(timer!)
+    timer = setInterval(updateTime, 1000)
+  }
 })
 
 onUnmounted(() => {
