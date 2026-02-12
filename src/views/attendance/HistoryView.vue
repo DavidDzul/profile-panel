@@ -54,48 +54,6 @@
 
       <template v-else>
         <v-col v-for="(item, i) in filteredHistory" :key="i" cols="12">
-          <!-- <v-card class="pa-4 rounded-lg elevation-1 d-flex flex-column">
-            <v-row class="ma-0 pa-0 align-center">
-              <v-col cols="12" class="pa-0 mb-2">
-                <div class="text-center">
-                  <div
-                    class="font-weight-bold text-primary text-body-1"
-                    style="word-break: break-word"
-                  >
-                    📚 {{ item.class.name }}
-                  </div>
-                  <div class="text-caption text--secondary">
-                    <strong>Fecha:</strong> {{ formatDate(item.class.date) }}
-                  </div>
-                  <div class="font-weight-bold text-caption">Horario:</div>
-                  <div class="text--primary text-caption">
-                    <v-icon size="small" color="secondary">mdi-clock-time-four-outline</v-icon>
-                    {{ item.class.start_time }} hrs a {{ item.class.end_time }} hrs
-                  </div>
-                </div>
-              </v-col>
-            </v-row>
-
-            <v-divider class="my-1"></v-divider>
-
-            <div class="d-flex justify-space-between align-center mt-2 flex-wrap">
-              <v-chip
-                :color="statusColor(item.status)"
-                dark
-                label
-                size="small"
-                class="font-weight-medium mb-2"
-              >
-                {{ statusMap.get(item.status)?.text }}
-              </v-chip>
-
-              <div class="text-caption d-flex flex-column align-end">
-                <div><strong>Entrada:</strong> {{ item.check_in || '—' }} hrs</div>
-                <div><strong>Salida:</strong> {{ item.check_out || '—' }} hrs</div>
-              </div>
-            </div>
-          </v-card> -->
-
           <v-expansion-panels variant="accordion" class="mb-4 custom-expansion">
             <v-expansion-panel class="rounded-lg overflow-hidden elevation-2">
               <v-expansion-panel-title class="pa-4">
@@ -108,12 +66,12 @@
                     <v-icon size="14" class="mr-1">mdi-calendar</v-icon>
                     {{ formatDate(item.class.date) }}
                     <v-chip
-                      :color="statusColor(item.status)"
+                      :color="statusColor(item)"
                       size="x-small"
                       variant="flat"
                       class="ml-3 font-weight-bold"
                     >
-                      {{ statusMap.get(item.status)?.text }}
+                      {{ statusText(item) }}
                     </v-chip>
                   </div>
                 </div>
@@ -216,9 +174,17 @@ const totalByStatus = computed(() => {
     ABSENT: 0,
   }
 
+  const today = dayjs().startOf('day')
+
   filteredHistory.value?.forEach((item) => {
+    const classDate = dayjs(item.class.date)
+
     if (item.status === 'JUSTIFIED_ABSENCE' || item.status === 'JUSTIFIED_LATE') {
       totals.JUSTIFIED++
+    } else if (item.status === 'ABSENT') {
+      if (classDate.isBefore(today, 'day')) {
+        totals.ABSENT++
+      }
     } else if (item.status in totals) {
       totals[item.status as StatusKey]++
     }
@@ -227,8 +193,20 @@ const totalByStatus = computed(() => {
   return totals
 })
 
-const statusColor = (status: string) => {
-  switch (status) {
+const statusText = (item: Attendance) => {
+  if (item.status === 'ABSENT' && !dayjs(item.class.date).isBefore(dayjs(), 'day')) {
+    return 'Pendiente'
+  }
+
+  return statusMap.get(item.status)?.text || 'N/A'
+}
+
+const statusColor = (item: Attendance) => {
+  if (item.status === 'ABSENT' && !dayjs(item.class.date).isBefore(dayjs(), 'day')) {
+    return 'grey-lighten-1'
+  }
+
+  switch (item.status) {
     case 'PRESENT':
       return 'green'
     case 'LATE':
